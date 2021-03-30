@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Cast Dog</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta1/css/bootstrap.min.css" integrity="sha512-thoh2veB35ojlAhyYZC0eaztTAUhxLvSZlWrNtlV01njqs/UdY3421Jg7lX0Gq9SRdGVQeL8xeBp9x1IPyL1wQ==" crossorigin="anonymous" />
+    </head>
+    <body>
+        <div class="container-sm">
+            <h1 class="display-1 text-center text-primary">Cast Dog</h1>
+            <div class="row">
+                <div class="col-md-4 offset-md-4">
+                    <label for="breedSelector" class="lead">Select breeds.</label>
+                    <select id="breedSelector" class="form-select form-select-lg">
+                        <option value="default">default</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3 offset-md-3 text-center">
+                    <button type="button" id="play" class="btn btn-lg btn-outline-primary">Play</button>
+                    <button type="button" id="stop" class="btn btn-lg btn-outline-danger" disabled>Stop</button>
+                </div>
+                <div class="col-md-3 text-center">
+                    <button type="button" id="cast" class="btn btn-lg btn-outline-primary">Cast</button>
+                    <button type="button" id="disconnect" class="btn btn-lg btn-outline-danger" disabled>Disconnect</button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <img src="https://images.dog.ceo/breeds/australian-shepherd/pepper2.jpg" alt="A picture of a dog." class="img-fluid rounded col-md-6 offset-md-3" id="image">
+            </div>
+        </div>
+        <script type="text/javascript">
+        (async function() {
+            const select = document.getElementById('breedSelector');
+            const res = await fetch('https://dog.ceo/api/breeds/list/all')
+            const breeds = await res.json();
+            for (let breed in breeds.message) {
+                const option = document.createElement('option');
+                option.text = breed;
+                option.value = breed;
+                select.appendChild(option);
+            }
+        })();
+        let localInterval;
+        document.getElementById('play').addEventListener('click', function () {
+            document.getElementById('stop').disabled = false;
+            document.getElementById('play').disabled = true;
+            const image = document.getElementById('image');
+            localInterval = setInterval( async function () {
+                let res;
+                const breed = document.getElementById('breedSelector').value;
+                if (breed === 'default') {
+                    res = await fetch('https://dog.ceo/api/breeds/image/random');
+                } else {
+                    res = await fetch(`https://dog.ceo/api/breed/${breed}/images/random`);
+                }
+                const data = await res.json();
+                image.src = data.message;
+            }, 3000);
+        });
+        document.getElementById('stop').addEventListener('click', function() {
+            document.getElementById('play').disabled = false;
+            document.getElementById('stop').disabled = true;
+            clearInterval(localInterval);
+        });
+        </script>
+    </body>
+</html>
